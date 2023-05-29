@@ -1,0 +1,132 @@
+#-------------------Problem Set 3------------------#
+#Taller de R estadistica y programacion 
+#Integrantes: 
+#Juan Jose Gutierrez 201923547 
+#Gabriela Ramirez --------- 
+#Laura Victoria González 202011064
+#R version 4.2.1 (2022-06-23)
+rm(list=ls())
+#Packages:
+require(pacman)
+p_load(tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
+
+#Punto 1
+
+##datos
+df=import("input/data_regresiones.rds")
+
+##modelos
+
+modelo_1=lm(price~ dist_cbd + as.factor(property_type),data=df)
+modelo_2=lm(price~ dist_cbd + as.factor(property_type) + rooms , data=df)
+modelo_3=lm(price~ dist_cbd + as.factor(property_type) + rooms + bathrooms ,data=df)
+
+## visualizacion
+coefplot(model=modelo_3) + theme_test()
+
+##
+ggsave(filename = "output/plot_regresione.png", width = 7 , height = 7 , units = "in")
+stargazer(modelo_1,modelo_2, modelo_3,
+          type="text",
+          out="output/resultados_regresiones.xlsx"
+)
+
+#Punto 2
+#Incisio 1
+# Se llama y/o instalan las librerias que nos permitirán trabajar con los datos espaciales.
+p_load(tidyverse,rio,skimr,
+       sf, ## Datos espaciales
+       leaflet, ## Visualizaciones
+       tmaptools, ## Geocodificar
+       ggsn, ## Map scale bar 
+       osmdata,
+       ggplot2, 
+       ggmap)
+
+##Primero, se obtendra la caja de coordenada que contiene el poligono (que es un tipo de arreglo espacial) para Medellin.
+opq(bbox = getbb("Medellin Colombia")) #Se queda pintado en la consola
+
+##Ahora se creará un objeto osm que contenga un feature sobre los restaurantes en Medellin.
+## Para los restaurantes, usaremos como key=amenity y value=restaurant. La clase del objeto osm sera una lista que contiene los datos espaciales de los restaurates en Medellin.
+osm_rest <- opq(bbox = getbb("Medellin Colombia")) %>%
+  add_osm_feature(key="amenity" , value="restaurant") 
+class(osm_rest) 
+
+##Se hará lo mismo para los parques en Medellin. La idea es que la geometria espacial del objeto sea un polígono.
+##  Para esto, usaremos como key=leisure y value=park
+osm_parques <- opq(bbox = getbb("Medellin Colombia")) %>%
+  add_osm_feature(key="leisure" , value="park") 
+class(osm_parques) 
+
+##Se accederá a los Simple Features de los objetos osm usando la función osmdata_sf(). El objeto contiene una lista de objetos con los puntos, lineas y poligonos disponibles
+#para los restaurantes.
+osm_rest_1 = osm_rest %>% osmdata_sf()
+osm_rest_1 ##note que tiene tanto informacion en puntos como en poligonos
+
+##para los parques.
+osm_parques_1 <- osm_parques %>% osmdata_sf()
+osm_parques_1 ##tiene informacion en poligonos, puntos y multipoligonos
+
+##Se accederá a los elementos de la lista para crear un objeto sf
+
+##aca deja de funcionar
+## Obtener un objeto sf a
+restaurantes =  osm_rest_1$osm_points[,c("osm_id", "amenity")]
+##Al utilizar osm_points y seleccionar la columna id, obtenemos los puntos sobre los cuales se encuentran los restaurantes en Medellin. 
+restaurantes
+parques = osm_parques_1$osm_polygons[,c("osm_id", "amenity")]
+ ##Al utilizar osm_polygons y seleccionar la columna id , obtenemos los poligonos sobre los cuales se encuentran los parques en Medellin.
+parques
+##Con estos objetos, se tienen las ubicaciones de los lugares que se quieren (restaurantes y parques en Medellin).
+
+##Inciso 2
+##Al tener un objeto del tipo sf, se puede pintar restaurantes y parques en Medellin con la función Leaflet() que permite hacer visualizaciones.
+
+##Pintar los restaurantes
+leaflet() %>% addTiles() %>% addCircles(data=restaurantes, color="red") ##Se utiliza add circles para verlos como puntos en el mapa.
+
+##Pintar los parques como polygonos
+leaflet() %>% addTiles() %>% addPolygons(data=parques) ##Se utiliza addPolygons para que los objetos se visualizen como poligonos en el mapa.
+
+##Todo el procedimiento anterior se puede hacer en pocas líneas usando el conector %>%. Sin embargo, se decide hacer el paso a paso para que sea claro.
+
+##Inciso 3
+##Se usará la función geocode_osm para codificar la dirección de la alcadia de Medellin.
+##la direccion de la alcadia es Cl 44 #52 - 165. 
+alcaldia_medellin <- geocode_OSM("Calle 44 %23% 52-165, Medellin", as.sf=T) ## Se usa el conector %23% para que r reconozca el caracter #. Conjuntmente, se usa la as.sf=true para que reconozca el objeto como sf.
+leaflet() %>% addTiles() %>% addCircles(data=alcaldia_medellin, color = "green")
+
+##Inciso 4
+##Primero, se obtendrá el polygono para Medellin con fines esteticos.
+##Primero, se obtendrá el polygono para Medellin con fines esteticos.
+med_osm <- opq(bbox = getbb("Medellin, Colombia")) %>%
+  add_osm_feature(key="boundary", value="administrative") %>%
+  osmdata_sf()
+
+med <- med_osm$osm_multipolygons %>% subset(admin_level==8)
+
+med <- st_transform(x = med , crs = 4326)
+
+med <- med %>% st_union()
+
+leaflet() %>% addTiles() %>% addPolygons(data = med , color="red")
+
+## Add osm layer
+osm_layer <- get_stamenmap(bbox= as.vector(st_bbox(med)), maptype="toner-line", source="osm", zoom=14)
+
+## Guardamos el mapa usando ggmap
+map <- ggmap(osm_layer) +
+  ggtitle("Zonas sociales en Medellin") +
+  geom_sf(data=med, alpha=0.3 , inherit.aes=F) +
+  geom_sf(data=restaurantes, aes(color="A"), inherit.aes = F) +
+  geom_sf(data=parques, aes(color="B"), inherit.aes = F)+
+  geom_sf(data=alcaldia_medellin, aes(color="C"),inherit.aes = F)+
+  scale_color_manual(labels=c("A"="Restaurantes","B"="Parques" , "C"="Alcaldia Medellin"),
+                     values=c("A"="red","B"="green" , "C"="blue"))
+##Se agrega un tema
+map <- map + theme_test()
+
+##Se exporta como png                        
+#ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
+ggsave("output/mapa_amenities1.png", width = 7 , height = 7 , units = "in", plot = map)
+
