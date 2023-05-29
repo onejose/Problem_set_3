@@ -130,3 +130,27 @@ map <- map + theme_test()
 #ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
 ggsave("output/mapa_amenities1.png", width = 7 , height = 7 , units = "in", plot = map)
 
+#Punto 3
+##Inciso 3.1
+
+#Desde la consola de Rstudio se lee el url 
+browseURL("https://es.wikipedia.org/wiki/Departamentos_de_Colombia")
+
+#Se crea un objeto que contenga el HTML de la página como un objeto **xml\_document**.
+my_html <- 
+  '<!DOCTYPE xml> 
+<xml>
+<meta charset="utf-8">
+<head>
+<title> Título de la página: Departamentos de Colombia </title>
+</head>
+<body>
+<h1> Title 1.</h1>
+<h2> Subtitle <u>subrayado-1</u>. </h2>
+<p> A continuación se encuentra la página de los Departamentos de Colombia <b>p</b> de <i>html</i> </p>
+<a href="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"> link a wikipedia </a>
+</body>
+</html>'
+
+my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
+browseURL(my_url)
