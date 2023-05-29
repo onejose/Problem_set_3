@@ -25,10 +25,10 @@ modelo_3=lm(price~ dist_cbd + as.factor(property_type) + rooms + bathrooms ,data
 coefplot(model=modelo_3) + theme_test()
 
 ##
-ggsave(filename = "output/plot_regresione.png")
+ggsave(filename = "output/plot_regresione.png", width = 7 , height = 7 , units = "in")
 stargazer(modelo_1,modelo_2, modelo_3,
           type="text",
-          out="output/resultados_regresiones.xls"
+          out="output/resultados_regresiones.xlsx"
 )
 
 #Punto 2
@@ -128,5 +128,5 @@ map <- map + theme_test()
 
 ##Se exporta como png                        
 #ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
-ggsave("output/mapa_amenities1.png", plot = map)
+ggsave("output/mapa_amenities1.png", width = 7 , height = 7 , units = "in", plot = map)
 
