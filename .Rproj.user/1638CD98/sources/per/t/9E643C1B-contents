@@ -2,7 +2,7 @@
 #Taller de R estadistica y programacion 
 #Integrantes: 
 #Juan Jose Gutierrez 201923547 
-#Gabriela Ramirez 202123417
+#Gabriela Ramirez --------- 
 #Laura Victoria González 202011064
 #R version 4.2.1 (2022-06-23)
 rm(list=ls())
