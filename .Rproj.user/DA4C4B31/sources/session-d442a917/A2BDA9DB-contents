@@ -1,7 +1,7 @@
 #-------------------Problem Set 3------------------#
 #Taller de R estadistica y programacion 
 #Integrantes: 
-#Juan Jose Gutierrez ---------- 
+#Juan Jose Gutierrez 201923547 
 #Gabriela Ramirez --------- 
 #Laura Victoria González 202011064
 #R version 4.2.1 (2022-06-23)
@@ -107,5 +107,5 @@ map <- map + theme_test()
 
 ##Se exporta como png                        
 #ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
-ggsave("/Users/lauragonzalez/Desktop/Problem_set_3/output/mapa_amenities1.png", plot = map)
+ggsave("output/mapa_amenities1.png", plot = map)
 
