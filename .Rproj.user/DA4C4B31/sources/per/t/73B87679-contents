@@ -151,13 +151,13 @@ my_html <-
 <a href="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"> link a wikipedia </a>
 </body>
 </html>'
-
 my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
 browseURL(my_url)
 
 xml_document = read_html(my_url)
 
 ##Inciso 3.2
-
 nodo_de_titulo = html_nodes(xml_document, xpath = "//title")
 titulo = html_text(nodo_de_titulo)
+cat(titulo, "\n")
+
