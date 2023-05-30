@@ -8,9 +8,9 @@
 rm(list=ls())
 #Packages:
 require(pacman)
-p_load(tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
+p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
 
-#Punto 1
+##--------------------------------Punto 1--------------------------------##
 
 ##datos
 df=import("input/data_regresiones.rds")
@@ -31,7 +31,7 @@ stargazer(modelo_1,modelo_2, modelo_3,
           out="output/resultados_regresiones.xlsx"
 )
 
-#Punto 2
+##--------------------------------Punto 2--------------------------------##
 #Incisio 1
 # Se llama y/o instalan las librerias que nos permitirán trabajar con los datos espaciales.
 p_load(tidyverse,rio,skimr,
@@ -130,7 +130,7 @@ map <- map + theme_test()
 #ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
 ggsave("output/mapa_amenities1.png", width = 7 , height = 7 , units = "in", plot = map)
 
-#Punto 3
+##--------------------------------Punto 3--------------------------------##
 ##Inciso 3.1
 
 #Desde la consola de Rstudio se lee el url 
@@ -154,3 +154,10 @@ my_html <-
 
 my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
 browseURL(my_url)
+
+xml_document = read_html(my_url)
+
+##Inciso 3.2
+
+nodo_de_titulo = html_nodes(xml_document, xpath = "//title")
+titulo
