@@ -155,9 +155,27 @@ my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
 browseURL(my_url)
 
 xml_document = read_html(my_url)
+class(xml_document)
 
 ##Inciso 3.2
 nodo_de_titulo = html_nodes(xml_document, xpath = "//title")
 titulo = html_text(nodo_de_titulo)
 cat(titulo, "\n")
+
+##Inciso 3.3
+tablas = xml_document %>% html_table()
+length(tablas)
+for (i in seq_along(tablas)) {
+  cat("Tabla", i, ":\n")
+  print(tablas[[i]])
+  cat("\n")
+}
+class(tablas)
+tabla_dptos = tablas[[4]]
+class(tabla_dptos)
+write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx") 
+
+## Inciso 3.4
+
+
 
