@@ -152,7 +152,6 @@ my_html <-
 </body>
 </html>'
 my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
-browseURL(my_url)
 
 xml_document = read_html(my_url)
 class(xml_document)
@@ -176,6 +175,4 @@ class(tabla_dptos)
 write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx") 
 
 ## Inciso 3.4
-
-
 
