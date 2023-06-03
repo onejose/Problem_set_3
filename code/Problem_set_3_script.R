@@ -156,6 +156,7 @@ my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
 xml_document = read_html(my_url)
 class(xml_document)
 
+
 ##Inciso 3.2
 nodo_de_titulo = html_nodes(xml_document, xpath = "//title")
 titulo = html_text(nodo_de_titulo)
@@ -176,3 +177,96 @@ write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx")
 
 ## Inciso 3.4
 
+#extraer todos los parrafos 
+abstrac <- df$abstrac
+abstrac %>% head()
+
+#========== Limpiar el texto ==========#  EJEMPLO BASE
+
+## Vamos a limpiar nuestros caracteres
+"todos los caracteres a minusculas"
+abstrac[5]
+abstrac = tolower(abstrac)
+abstrac[5]
+
+## Eliminar carcateres especiales
+str_remove_all(string="Washington (D.C.)" , pattern="[^[:alnum:] ]")
+str_replace_all(string="Washington (D.C.)" , pattern="[^[:alnum:] ]" , replacement="")
+abstrac = str_replace_all(string=abstrac , pattern="[^[:alnum:] ]" , replacement=" ")
+
+## Eliminar  acentos
+stri_trans_general("Ahí está la Economía", "Latin-ASCII")
+stri_trans_general("Colombia in the late 1990âs", "Latin-ASCII")
+abstrac = stri_trans_general(abstrac, "Latin-ASCII")
+
+## Remover puntuacion
+removePunctuation("- Hola como estas?")
+abstrac = removePunctuation(abstrac)
+
+## Remover numeros
+removeNumbers("Desde de 1950 existe")
+abstrac = removeNumbers(abstrac)
+
+## Remover preposiciones y/o conectores
+stopwords("spanish") 
+stopwords("en")
+removeWords("En la luna existen algunas evidencias",stopwords("spanish"))
+abstrac = removeWords(abstrac,stopwords("en"))
+
+## Remover otras cadena de caracteres
+abstrac = removeWords(abstrac,c("et","abstrac","documento", "paper"))
+
+## Remover exceso de espacios
+stripWhitespace("Hola    como   estas ")
+abstrac = stripWhitespace(abstrac) 
+
+## Remover espacios iniaciales y finales
+trimws(" Hola como estas ")
+abstrac = trimws(abstrac)
+
+## Verificar cuantos caracteres se eliminaron
+abstrac[5] %>% nchar()
+df$abstrac[5] %>% trimws() %>% nchar()
+
+abstrac[10]
+df$abstrac[10] %>% trimws()
+
+#========== De texto a corpus ==========# 
+
+## vector de caracteres a corpues
+abstrac_corpus = Corpus(VectorSource(abstrac)) # formato de texto
+class(abstrac_corpus)
+
+## matriz con terminos
+tdm_abstrac = TermDocumentMatrix(abstrac_corpus)
+class(tdm_abstrac)  
+
+## frecuencia de palabras (se repiten almenos 20 veces)
+findFreqTerms(tdm_abstrac, lowfreq = 20)
+frecuentes = findFreqTerms(tdm_abstrac, lowfreq = 20)
+
+## palabras con las que mas se asocian las primeras 5 palabras del vector frecuentes
+findAssocs(tdm_abstrac, frecuentes[1:5], rep(x = 0.45, rep = 50))
+
+## Convirtamos el objeto tdm_abstrac en una matriz con frecuencias
+matrix_abstrac = as.matrix(tdm_abstrac) #lo vuelve una matriz
+dim(matrix_abstrac)
+view(matrix_abstrac)
+
+## Sumemos la frecuencia de cada palabra
+frec_words = sort(rowSums(matrix_abstrac),decreasing=T) 
+class(frec_words)
+df_words = data.frame(word = names(frec_words) , n = frec_words)
+
+## Histograma con frecuencias
+barplot(df_words[1:10,]$n, las = 2, names.arg = df_words[1:10,]$word,
+        col ="orange", main = "Palabras frecuentes" , ylab = "Frecuencia de palabras")
+
+#No se si sea necesario limpiar el texto así
+## Grafiquemos la nube de palabras
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 6,
+          max.words = 250 , random.order = T , rot.per = 0.35 , scale = c(10,1))
+
+
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))

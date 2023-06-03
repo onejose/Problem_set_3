@@ -2,15 +2,15 @@
 #Taller de R estadistica y programacion 
 #Integrantes: 
 #Juan Jose Gutierrez 201923547 
-#Gabriela Ramirez --------- 
+#Gabriela Ramirez 202123417
 #Laura Victoria González 202011064
 #R version 4.2.1 (2022-06-23)
 rm(list=ls())
 #Packages:
 require(pacman)
-p_load(tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
+p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
 
-#Punto 1
+##--------------------------------Punto 1--------------------------------##
 
 ##datos
 df=import("input/data_regresiones.rds")
@@ -31,7 +31,7 @@ stargazer(modelo_1,modelo_2, modelo_3,
           out="output/resultados_regresiones.xlsx"
 )
 
-#Punto 2
+##--------------------------------Punto 2--------------------------------##
 #Incisio 1
 # Se llama y/o instalan las librerias que nos permitirán trabajar con los datos espaciales.
 p_load(tidyverse,rio,skimr,
@@ -130,3 +130,143 @@ map <- map + theme_test()
 #ggsave("output/mapa_amenities1.png", map) # Crear la carpeta "output" si no existe
 ggsave("output/mapa_amenities1.png", width = 7 , height = 7 , units = "in", plot = map)
 
+##--------------------------------Punto 3--------------------------------##
+##Inciso 3.1
+
+#Desde la consola de Rstudio se lee el url 
+browseURL("https://es.wikipedia.org/wiki/Departamentos_de_Colombia")
+
+#Se crea un objeto que contenga el HTML de la página como un objeto **xml\_document**.
+my_html <- 
+  '<!DOCTYPE xml> 
+<xml>
+<meta charset="utf-8">
+<head>
+<title> Título de la página: Departamentos de Colombia </title>
+</head>
+<body>
+<h1> Title 1.</h1>
+<h2> Subtitle <u>subrayado-1</u>. </h2>
+<p> A continuación se encuentra la página de los Departamentos de Colombia <b>p</b> de <i>html</i> </p>
+<a href="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"> link a wikipedia </a>
+</body>
+</html>'
+my_url ="https://es.wikipedia.org/wiki/Departamentos_de_Colombia"
+
+xml_document = read_html(my_url)
+class(xml_document)
+
+
+##Inciso 3.2
+nodo_de_titulo = html_nodes(xml_document, xpath = "//title")
+titulo = html_text(nodo_de_titulo)
+cat(titulo, "\n")
+
+##Inciso 3.3
+tablas = xml_document %>% html_table()
+length(tablas)
+for (i in seq_along(tablas)) {
+  cat("Tabla", i, ":\n")
+  print(tablas[[i]])
+  cat("\n")
+}
+class(tablas)
+tabla_dptos = tablas[[4]]
+class(tabla_dptos)
+write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx") 
+
+## Inciso 3.4
+
+#extraer todos los parrafos 
+abstrac <- df$abstrac
+abstrac %>% head()
+
+#========== Limpiar el texto ==========#  EJEMPLO BASE
+
+## Vamos a limpiar nuestros caracteres
+"todos los caracteres a minusculas"
+abstrac[5]
+abstrac = tolower(abstrac)
+abstrac[5]
+
+## Eliminar carcateres especiales
+str_remove_all(string="Washington (D.C.)" , pattern="[^[:alnum:] ]")
+str_replace_all(string="Washington (D.C.)" , pattern="[^[:alnum:] ]" , replacement="")
+abstrac = str_replace_all(string=abstrac , pattern="[^[:alnum:] ]" , replacement=" ")
+
+## Eliminar  acentos
+stri_trans_general("Ahí está la Economía", "Latin-ASCII")
+stri_trans_general("Colombia in the late 1990âs", "Latin-ASCII")
+abstrac = stri_trans_general(abstrac, "Latin-ASCII")
+
+## Remover puntuacion
+removePunctuation("- Hola como estas?")
+abstrac = removePunctuation(abstrac)
+
+## Remover numeros
+removeNumbers("Desde de 1950 existe")
+abstrac = removeNumbers(abstrac)
+
+## Remover preposiciones y/o conectores
+stopwords("spanish") 
+stopwords("en")
+removeWords("En la luna existen algunas evidencias",stopwords("spanish"))
+abstrac = removeWords(abstrac,stopwords("en"))
+
+## Remover otras cadena de caracteres
+abstrac = removeWords(abstrac,c("et","abstrac","documento", "paper"))
+
+## Remover exceso de espacios
+stripWhitespace("Hola    como   estas ")
+abstrac = stripWhitespace(abstrac) 
+
+## Remover espacios iniaciales y finales
+trimws(" Hola como estas ")
+abstrac = trimws(abstrac)
+
+## Verificar cuantos caracteres se eliminaron
+abstrac[5] %>% nchar()
+df$abstrac[5] %>% trimws() %>% nchar()
+
+abstrac[10]
+df$abstrac[10] %>% trimws()
+
+#========== De texto a corpus ==========# 
+
+## vector de caracteres a corpues
+abstrac_corpus = Corpus(VectorSource(abstrac)) # formato de texto
+class(abstrac_corpus)
+
+## matriz con terminos
+tdm_abstrac = TermDocumentMatrix(abstrac_corpus)
+class(tdm_abstrac)  
+
+## frecuencia de palabras (se repiten almenos 20 veces)
+findFreqTerms(tdm_abstrac, lowfreq = 20)
+frecuentes = findFreqTerms(tdm_abstrac, lowfreq = 20)
+
+## palabras con las que mas se asocian las primeras 5 palabras del vector frecuentes
+findAssocs(tdm_abstrac, frecuentes[1:5], rep(x = 0.45, rep = 50))
+
+## Convirtamos el objeto tdm_abstrac en una matriz con frecuencias
+matrix_abstrac = as.matrix(tdm_abstrac) #lo vuelve una matriz
+dim(matrix_abstrac)
+view(matrix_abstrac)
+
+## Sumemos la frecuencia de cada palabra
+frec_words = sort(rowSums(matrix_abstrac),decreasing=T) 
+class(frec_words)
+df_words = data.frame(word = names(frec_words) , n = frec_words)
+
+## Histograma con frecuencias
+barplot(df_words[1:10,]$n, las = 2, names.arg = df_words[1:10,]$word,
+        col ="orange", main = "Palabras frecuentes" , ylab = "Frecuencia de palabras")
+
+#No se si sea necesario limpiar el texto así
+## Grafiquemos la nube de palabras
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 6,
+          max.words = 250 , random.order = T , rot.per = 0.35 , scale = c(10,1))
+
+
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))
