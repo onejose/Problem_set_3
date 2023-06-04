@@ -233,5 +233,5 @@ wordcloud(words = df_words$word, freq = df_words$n, min.freq = 6,
 wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
           max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))
 
-ruta_imagen_2 <- "output/nube_palabras_final.png"
+ruta_imagen_2 <- "output/nube_palabras.png"
 
