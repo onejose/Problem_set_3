@@ -3,9 +3,9 @@
     "path": "~/Documents/GitHub/Problem_set_3/code/Problem_set_3_script.R",
     "project_path": "code/Problem_set_3_script.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "1252577773",
     "contents": "",
-    "dirty": true,
+    "dirty": false,
     "created": 1685337454306.0,
     "source_on_save": false,
     "relative_order": 1,
@@ -13,14 +13,14 @@
         "source_window_id": "",
         "Source": "Source",
         "cursorPosition": "237,0",
-        "scrollLine": "180"
+        "scrollLine": "213"
     },
     "folds": "",
-    "lastKnownWriteTime": 1685908475,
+    "lastKnownWriteTime": 1685909028,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1685908903409,
+    "last_content_update": 1685909028113,
     "read_only": false,
     "read_only_alternatives": []
 }
