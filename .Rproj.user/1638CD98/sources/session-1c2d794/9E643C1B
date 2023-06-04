@@ -3,7 +3,7 @@
     "path": "~/Documents/GitHub/Problem_set_3/code/Problem_set_3_script.R",
     "project_path": "code/Problem_set_3_script.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "1803355778",
     "contents": "",
     "dirty": false,
     "created": 1685337454306.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "179,28",
-        "scrollLine": "169"
+        "cursorPosition": "237,0",
+        "scrollLine": "6"
     },
     "folds": "",
-    "lastKnownWriteTime": 1685820132,
+    "lastKnownWriteTime": 1685908475,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1685820132491,
+    "last_content_update": 1685908475881,
     "read_only": false,
     "read_only_alternatives": []
 }
