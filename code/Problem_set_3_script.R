@@ -186,7 +186,10 @@ parrafos <- xml_document %>% html_nodes("p") %>% html_text()
 
 
 wordcloud(parrafos)
-ruta_imagen_1 <- "output/nube_palabras_negro.png"
+output_file_1 <- "output/nube_palabras_negro.png"
+png(output_file_1)
+wordcloud(parrafos)
+dev.off()
 
 #========== Hacerla más completa y con colores ==========#
 
