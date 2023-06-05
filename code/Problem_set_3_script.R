@@ -236,8 +236,9 @@ wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
 wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
           max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))
 
-ruta_imagen_2 <- "output/nube_palabras.png"
-ggsave
+output_file <- "output/nube_palabras.png"
+png(output_file)
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000, random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+dev.off()
 
-ruta_imagen_2 <- "nube_palabras.png"
-ggsave(ruta_imagen_2,path = "output/nube_palabras.png") 
