@@ -9,7 +9,6 @@ rm(list=ls())
 #Packages:
 require(pacman)
 p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
-install.packages("wordcloud")
 library(wordcloud)
 
 ##install.packages("tm", dependencies = TRUE)
@@ -239,3 +238,6 @@ wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
 
 ruta_imagen_2 <- "output/nube_palabras.png"
 ggsave
+
+ruta_imagen_2 <- "nube_palabras.png"
+ggsave(ruta_imagen_2,path = "output/nube_palabras.png") 
