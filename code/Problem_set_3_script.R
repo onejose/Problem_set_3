@@ -8,7 +8,7 @@
 rm(list=ls())
 #Packages:
 require(pacman)
-p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
+p_load(openxlsx, rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
 library(wordcloud)
 
 ##install.packages("tm", dependencies = TRUE)
@@ -29,12 +29,15 @@ modelo_3=lm(price~ dist_cbd + as.factor(property_type) + rooms + bathrooms ,data
 ## visualizacion
 coefplot(model=modelo_3) + theme_test()
 
-##
+## Nota importante: el comando que vimos en clase para guardar los resultados en excel no sirvio porque stargazer solo guarda cosas formato laTex o HTML, asi que usamos comandos de la libreria "openxlsx".
 ggsave(filename = "output/plot_regresione.png", width = 7 , height = 7 , units = "in")
-stargazer(modelo_1,modelo_2, modelo_3,
-          type="text",
-          out="output/resultados_regresiones.xlsx"
-)
+tablas_de_reg= capture.output(stargazer(modelo_1,modelo_2, modelo_3,
+          type="text"))
+class(tablas_de_reg)
+resultados = createWorkbook()
+addWorksheet(resultados, "Resultados regresion")
+writeData(resultados, "Resultados regresion", tablas_de_reg, colNames = FALSE)
+saveWorkbook(resultados, file = "output/resultados_regresiones.xlsx", overwrite = TRUE)
 
 ##--------------------------------Punto 2--------------------------------##
 #Incisio 1
