@@ -1,16 +1,4 @@
-#-------------------Problem Set 3------------------#
-#Taller de R estadistica y programacion 
-#Integrantes: 
-#Juan Jose Gutierrez 201923547 
-#Gabriela Ramirez 202123417
-#Laura Victoria González 202011064
-#R version 4.2.1 (2022-06-23)
-rm(list=ls())
-#Packages:
-require(pacman)
-p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
-install.packages("wordcloud")
-library(wordcloud)
+
 
 ##install.packages("tm", dependencies = TRUE)
 #install_github("cran/tm")
