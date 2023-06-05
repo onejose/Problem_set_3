@@ -8,9 +8,15 @@
 rm(list=ls())
 #Packages:
 require(pacman)
-p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot)
+p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
+install.packages("wordcloud")
+library(wordcloud)
 
-##--------------------------------Punto 1--------------------------------##
+##install.packages("tm", dependencies = TRUE)
+#install_github("cran/tm")
+#Yes
+
+###--------------------------------Punto 1--------------------------------##
 
 ##datos
 df=import("input/data_regresiones.rds")
@@ -176,3 +182,60 @@ write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx")
 
 ## Inciso 3.4
 
+#extraer todos los parrafos 
+parrafos <- xml_document %>% html_nodes("p") %>% html_text()
+
+
+wordcloud(parrafos)
+ruta_imagen_1 <- "output/nube_palabras_negro.png"
+
+#========== Hacerla más completa y con colores ==========#
+
+## Minúsculas
+parrafos[5]
+parrafos = tolower(parrafos)
+parrafos[5]
+
+#========== De texto a corpus ==========# 
+
+## vector de caracteres a corpues
+parrafos_corpus = Corpus(VectorSource(parrafos)) # formato de texto
+class(parrafos_corpus)
+
+## matriz con terminos de los parrafos
+tdm_parrafos = TermDocumentMatrix(parrafos_corpus)
+class(tdm_parrafos)  
+
+## frecuencia de palabras (se repiten almenos 20 veces)
+findFreqTerms(tdm_parrafos, lowfreq = 20)
+frecuentes = findFreqTerms(tdm_parrafos, lowfreq = 20)
+
+## palabras con las que mas se asocian las primeras 5 palabras del vector frecuentes
+findAssocs(tdm_parrafos, frecuentes[1:5], rep(x = 0.45, rep = 50))
+
+## Convertir el objeto tdm_parrafos en una matriz con frecuencias
+matrix_parrafos = as.matrix(tdm_parrafos) #lo vuelve una matriz
+dim(matrix_parrafos)
+view(matrix_parrafos)
+
+## Sumemos la frecuencia de cada palabra
+frec_words = sort(rowSums(matrix_parrafos),decreasing=T) 
+class(frec_words)
+df_words = data.frame(word = names(frec_words) , n = frec_words)
+
+## Histograma con frecuencias
+barplot(df_words[1:10,]$n, las = 2, names.arg = df_words[1:10,]$word,
+        col ="orange", main = "Palabras frecuentes" , ylab = "Frecuencia de palabras")
+
+## Graficar la nube de palabras
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 6,
+          max.words = 250 , random.order = T , rot.per = 0.35 , scale = c(10,1))
+
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000 , random.order = T )
+
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))
+
+ruta_imagen_2 <- "output/nube_palabras.png"
+ggsave

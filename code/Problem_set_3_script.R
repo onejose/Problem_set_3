@@ -9,6 +9,8 @@ rm(list=ls())
 #Packages:
 require(pacman)
 p_load(rvest, tidyverse, rio, arrow, broom, mfx, margins,estimatr,lmtest,fixest, modelsummary, stargazer, writexl, coefplot, wordcloud, textcat,stringi,tm,cluster)
+install.packages("wordcloud")
+library(wordcloud)
 
 ##install.packages("tm", dependencies = TRUE)
 #install_github("cran/tm")
@@ -183,7 +185,7 @@ write_xlsx(tabla_dptos,path = "output/tabla_departamento.xlsx")
 #extraer todos los parrafos 
 parrafos <- xml_document %>% html_nodes("p") %>% html_text()
 
-library(wordcloud)
+
 wordcloud(parrafos)
 ruta_imagen_1 <- "output/nube_palabras_negro.png"
 
@@ -229,9 +231,11 @@ barplot(df_words[1:10,]$n, las = 2, names.arg = df_words[1:10,]$word,
 wordcloud(words = df_words$word, freq = df_words$n, min.freq = 6,
           max.words = 250 , random.order = T , rot.per = 0.35 , scale = c(10,1))
 
+wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
+          max.words = 2000 , random.order = T )
 
 wordcloud(words = df_words$word, freq = df_words$n, min.freq = 1,
           max.words = 2000 , random.order = F ,colors = brewer.pal(10, "Dark2"))
 
 ruta_imagen_2 <- "output/nube_palabras.png"
-
+ggsave
